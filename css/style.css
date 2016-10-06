@@ -1,0 +1,149 @@
+* {
+  margin: 0;
+}
+
+.clearfix:after {
+     visibility: hidden;
+     display: block;
+     font-size: 0;
+     content: " ";
+     clear: both;
+     height: 0;
+     }
+.clearfix { display: inline-block; }
+/* start commented backslash hack \*/
+* html .clearfix { height: 1%; }
+.clearfix { display: block; }
+/* close commented backslash hack */
+
+body {
+  margin: 0 auto;
+  display: block;
+  font-family: 'Raleway', sans-serif;
+  background-color: #fff;
+  color: white;
+}
+
+#container {
+  position: relative;
+}
+
+div.visualization {
+  margin: 0 auto;
+  width: 90%;
+  position: relative;
+}
+
+svg {
+  display: block;
+  margin: 0 auto;
+}
+
+div.menu-container {
+  width: 100%;
+  background-color: #333;
+}
+
+nav.menu {
+  width: 90%;
+  margin: 0 auto;
+  height: 60px;
+}
+
+div.vis-selector {
+  height: 60px;
+  margin: 0;
+}
+
+div.vis-selector h1 {
+  font-family: 'Dosis', sans-serif;
+  font-weight: 200;
+  margin: 0;
+  font-size: 30px;
+  line-height: 60px;
+  display: block;
+  float: left;
+  margin-right: 50px;
+}
+
+div.vis-selector a {
+  display: block;
+  float: left;
+  font-size: 12px;
+  line-height: 60px;
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: 'Raleway', sans-serif;
+  padding: 0 10px;
+}
+
+div.vis-selector a.nav:hover {
+  box-shadow: 0px -5px 0px #dd1924 inset;
+}
+
+div.vis-selector a.selected-vis {
+  box-shadow: 0px -5px 0px #dd1924 inset;
+}
+
+div.vis-selector a:last-child {
+  float: right;
+}
+
+text, p.uf {
+  font-family: "Raleway", sans-serif;
+}
+
+text.bold, p.bold {
+  font-weight: bold;
+}
+
+text.light {
+  font-weight: normal;
+}
+
+
+line.highlight-division {
+  stroke-width: 0.5;
+  stroke: #999;
+}
+
+/*text.month, text.year, text.year-selector, p.uf, text.title, text.subtitle, text.title-description, text.graph-description */
+
+text {
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */
+  cursor: default;
+}
+
+p.sudeste {
+  border-bottom: 2px solid #1A1A1A;
+}
+p.sul {
+  border-bottom: 2px solid #666666;
+}
+p.nordeste {
+  border-bottom: 2px solid #b2b2b2;
+}
+p.centro-oeste {
+  border-bottom: 2px solid #cccccc;
+}
+p.norte {
+  border-bottom: 2px solid #e6e6e6;
+}
+
+
+circle.movie-info:hover, circle.menu-option:hover,
+circle.region-selector:hover, circle.graph-points:hover,
+circle.value-selector:hover, circle.year-month:hover,
+circle.movies-ranking:hover, rect.month,
+rect#lightbox:hover, text#close:hover,
+text.month, text.year,
+text.year-selector, rect.country-bar,
+path.country-path, p.uf, path.dropdown,
+rect.menu-dropdown, text.menu-dropdown,
+rect.continent-selector {
+  cursor: pointer;
+}
