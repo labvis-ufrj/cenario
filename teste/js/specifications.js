@@ -275,12 +275,12 @@ var visConfig = {
     "2014": 5,
   },
   continents: {
+    "Oceania": 0,
+    "África": 1,
+    "Ásia": 2,
+    "Europa": 3,
     "América do Sul": 4,
     "América do Norte": 5,
-    "Europa": 3,
-    "Ásia": 0,
-    "África": 1,
-    "Oceania": 2
   },
   continentsFilter: {
     "América do Sul": true,
@@ -317,9 +317,9 @@ var visConfig = {
     "90": 2
   },
   continentsArr: [
-    "Ásia",
-    "África",
     "Oceania",
+    "África",
+    "Ásia",
     "Europa",
     "América do Sul",
     "América do Norte",
