@@ -7,7 +7,7 @@ Interactive data visualization about the brazilian's cinema dynamics.
 
 By Pedro Reis and Victória Molgado
 
-http://pedrorv.github.io/cenario/
 
+http://pedrorv.github.io/cenario/
 
 https://labvis-ufrj.github.io/cenario/
