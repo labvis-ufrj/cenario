@@ -15,45 +15,33 @@ function createVisOverview(userWindowWidth) {
 
   function createVis() {
 
+    deleteVis();
+
     var dragX = d3.behavior.drag()
         .on("drag", function() {
             var dx = d3.event.x,
                 self = d3.select(this);
 
+            self.attr('grab', 'yes');
+
             var index = testXPosition(dx);
             index = (index < 0) ? 0 : (index > 11) ? 11 : index;
 
             var selfCurrentMonth = parseInt(self.attr("currentmonth"));
-            moveMainElementsX(dx, selfCurrentMonth, 0);
+            moveMainElementsX(dx, selfCurrentMonth, 0);           
 
-            if (index !== false) {
-              var diff = Math.abs(selfCurrentMonth - index);
-            }
-            if (diff > 1) {
-                if (index > selfCurrentMonth) {
-                  for (var i = 0; i < diff; i++) {
-                    moveAllElementsX((index-1-i), (index-i), selfCurrentMonth);
-                  }
-                }
-                else if (index < selfCurrentMonth) {
-                  for (var i = 0; i < diff; i++) {
-                    moveAllElementsX((index+1+i), (index+i), selfCurrentMonth);
-                  }
-                }
-            }
-            else {
-              if (index || index === 0) {
-                if (index > selfCurrentMonth) {
-                  moveAllElementsX((index-1), index, selfCurrentMonth);
-                } else if (index < selfCurrentMonth) {
-                  moveAllElementsX((index+1), index, selfCurrentMonth);
-                }
+            if (index || index === 0) {
+              if (index > selfCurrentMonth) {
+                moveAllElementsX((index-1), index, selfCurrentMonth);
+              } else if (index < selfCurrentMonth) {
+                moveAllElementsX((index+1), index, selfCurrentMonth);
               }
             }
           })
           .on("dragend", function() {
 
             var self = d3.select(this);
+            self.attr('grab', 'no');
             var x = returnXPosition(parseInt(self.attr("currentmonth")));
             var selfCurrentMonth = self.attr("currentmonth");
 
@@ -305,8 +293,7 @@ function createVisOverview(userWindowWidth) {
         .attr("height", visConfig.hMonthBox)
         .attr("fill", visConfig.monthBoxHexValue)
         .attr("originalmonth", month)
-        .attr("currentmonth", month)
-        .call(dragX);
+        .attr("currentmonth", month);
 
       visMonths.append("text")
         .attr("class", "month")
@@ -321,8 +308,7 @@ function createVisOverview(userWindowWidth) {
         .attr("font-size", visConfig.monthBoxTextSize)
         .text(visConfig.months[month])
         .attr("originalmonth", month)
-        .attr("currentmonth", month)
-        .call(dragX);
+        .attr("currentmonth", month);
 
       visMonths.append("rect")
         .attr("class", "month")
@@ -563,7 +549,7 @@ function createVisOverview(userWindowWidth) {
       .attr("font-size", visConfig.ovrHighlightSubtitleSize)
       .attr("text-anchor", "start")
       .text(function() {
-        return "Filmes mais vistos entre os " + visConfig.dataCircles[year][month]["Títulos"] + " lançados";
+        return "Ranking dos mais vistos entre os " + visConfig.dataCircles[year][month]["Títulos"] + " lançados";
       })
       .attr("opacity", 0)
       .transition()
@@ -596,7 +582,7 @@ function createVisOverview(userWindowWidth) {
         .attr("opacity", 0)
         .on("mouseover", function() {
           var self = d3.select(this);
-          self.attr("stroke", visConfig.ovrStrokeCircleColor).attr("stroke-width", 3);
+          self.attr("stroke", visConfig.ovrStrokeCircleColor).attr("stroke-width", 5);
         })
         .on("mouseleave", function() {
           var self = d3.select(this);

@@ -24,6 +24,15 @@ body {
   color: white;
 }
 
+div.about-page {
+  text-align: justify;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
+
 #container {
   position: relative;
 }
@@ -132,24 +141,25 @@ p.nav, h1, p.uf {
 
 
 p.sudeste {
-  border-bottom: 2px solid #404040;
+  border-bottom: 2px solid #7DB2DD;
 }
 p.sul {
-  border-bottom: 2px solid #93648D;
+  border-bottom: 2px solid #F8A40D;
 }
 p.nordeste {
-  border-bottom: 2px solid #4CC3D9;
+  border-bottom: 2px solid #688BAD;
 }
 p.centro-oeste {
-  border-bottom: 2px solid #7BC8A4;
+  border-bottom: 2px solid #0079B5;
 }
 p.norte {
-  border-bottom: 2px solid #F16745;
+  border-bottom: 2px solid #FC4F68;
 }
 
 
+rect.pause-button, path.play-button,
 circle.movie-info:hover, circle.menu-option:hover,
-circle.region-selector:hover, circle.graph-points:hover,
+rect.region-selector:hover, circle.graph-points:hover,
 circle.value-selector:hover, circle.year-month:hover,
 circle.movies-ranking:hover, rect.month,
 rect#lightbox:hover, text#close:hover,
@@ -161,6 +171,17 @@ rect.continent-selector {
   cursor: pointer;
 }
 
+rect.month:hover, text.month:hover, rect.year:hover, text.year:hover {
+  cursor: grab;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+rect[grab="yes"], text[grab="yes"] {
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+  cursor: -moz-grabbing !important;
+}
 
 div.about-page {
   width: inherit;
@@ -171,11 +192,12 @@ div.about-content {
   float: left;
   box-sizing: border-box;
   min-height: 100px;
-  padding: 40px 20px;
+  padding: 20px;
+  margin: 40px 0;
 }
 
 div.about-content:first-child {
-  border-right: 2px solid gray;
+  border-right: 1px solid gray;
 }
 
 div.team-member {

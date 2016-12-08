@@ -4,10 +4,6 @@
 
 function deleteVis() {
   d3.select("g.vis").remove();
-  if (d3.select("svg.datamap")) {
-    d3.select("svg.datamap").remove();
-    d3.select("div.datamaps-hoverover").remove();
-  }
 }
 
 function formatNumber(number) {
@@ -51,6 +47,10 @@ function roundMultPowerTen(num) {
   }
   var power = Math.pow(10, (n<=1) ? 1 : (n-1));
   return num + (power - (num % power));
+}
+
+function toRadians(degrees) {
+  return degrees * Math.PI / 180;
 }
 
 // ----------------------------------------------------------------

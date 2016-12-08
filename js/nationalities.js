@@ -19,6 +19,8 @@ function createVisNationalities(userWindowWidth) {
 
   function createVis() {
 
+    deleteVis();
+
     // Initial state of vis
     for (var continent in visConfig.continentsFilter) {
       visConfig.continentsFilter[continent] = true;
@@ -33,6 +35,19 @@ function createVisNationalities(userWindowWidth) {
       .attr("class", "vis");
 
     var ratio = scaleRatio(userWindowWidth, visConfig.width, visConfig.baseWidth);
+
+    // Rect used to set all opacities to 1 
+    vis.append("rect")
+       .attr("x", 0)
+       .attr("y", 0)
+       .attr("width", visConfig.width)
+       .attr("height", visConfig.height)
+       .attr("fill", "#FFFFFF")
+       .on("click", function() {
+         d3.selectAll("path.country-path").attr("opacity", 1);
+         d3.selectAll("rect.country-bar").attr("opacity", 1);
+         d3.selectAll("text.description-texts").text("");
+       });
 
     var superscription = vis.append("g")
       .attr("class", "superscription");
@@ -66,7 +81,7 @@ function createVisNationalities(userWindowWidth) {
     // Fist menu filter title
 
     menuFilters.append("text")
-      .attr("class", "subtitle")
+      .attr("class", "subtitle bold")
       .attr("x", visConfig.baseWMargin)
       .attr("y", visConfig.natMenuFirstTitleH)
       .attr("text-anchor", "start")
@@ -77,7 +92,7 @@ function createVisNationalities(userWindowWidth) {
     // Second menu filter title
 
     menuFilters.append("text")
-      .attr("class", "subtitle")
+      .attr("class", "subtitle bold")
       .attr("x", visConfig.baseWMargin)
       .attr("y", visConfig.natMenuSecondTitleH)
       .attr("text-anchor", "start")
@@ -183,12 +198,13 @@ function createVisNationalities(userWindowWidth) {
           if (year == 2009) return "year-selector bold";
           return "year-selector light";
         })
+        .attr("id", "y" + year)
         .attr("year", year)
         .attr("x", function() {
           return visConfig.natMenuYearsW + (visConfig.years[year]*visConfig.natMenuWDistance);
         })
         .attr("y", visConfig.natMenuYearsH)
-        .attr("text-anchor", "start")
+        .attr("text-anchor", "middle")
         .attr("fill", function() {
           if (year == 2009) return visConfig.natMenuYearsColorSelected;
           return visConfig.natMenuYearsColorNotSelected;
@@ -207,9 +223,101 @@ function createVisNationalities(userWindowWidth) {
 
     }
 
+    // Continent line
+
+    menuFilters.append("line")
+      .attr("x1", visConfig.natDivisionLineW)
+      .attr("y1", visConfig.natDivisionLineH)
+      .attr("x2", visConfig.natDivisionLineW + visConfig.natDivisionLineSize)
+      .attr("y2", visConfig.natDivisionLineH)
+      .attr("stroke", visConfig.natDivisionLineColor)
+      .attr("stroke-width", visConfig.natDivisionLineThickness);
+
+    menuFilters.append("rect")
+      .attr("class", "year-indicator")
+      .attr("x", visConfig.natYearIndicatorW - visConfig.natYearIndicatorSize/2)
+      .attr("y", visConfig.natYearIndicatorH)
+      .attr("width", visConfig.natYearIndicatorSize)
+      .attr("height", visConfig.natYearIndicatorThickness)
+      .attr("fill", visConfig.natYearIndicatorColor);
+
+
+    // Play/Pause Controllers
+
+    menuFilters.append("path")
+      .attr("class", "play-button")
+      .attr("d", function() {
+        var str = "";
+        str += "M " + visConfig.baseWMargin + " " + visConfig.natPlayButtonStartH + " ";
+        str += "L " + (visConfig.baseWMargin + (Math.cos(toRadians(30)) * visConfig.natPlayButtonSize)) + " " +
+                      (visConfig.natPlayButtonStartH - (Math.cos(toRadians(60)) * visConfig.natPlayButtonSize)) + " ";
+        str += "L " + visConfig.baseWMargin + " " + (visConfig.natPlayButtonStartH - visConfig.natPlayButtonSize) + " Z";
+        return str;
+      })
+      .attr("fill", visConfig.natPlayButtonColor)
+      .on("click", timeAnimation);
+
+    menuFilters.append("rect")
+      .attr("class", "pause-button")
+      .attr("y", visConfig.natPauseButtonH)
+      .attr("x", visConfig.natPauseButtonW)
+      .attr("width", visConfig.natPauseButtonWidthSize)
+      .attr("height", visConfig.natPauseButtonHeight)
+      .attr("fill", visConfig.natPlayButtonColor);
+
+    menuFilters.append("rect")
+      .attr("class", "pause-button")
+      .attr("y", visConfig.natPauseButtonH)
+      .attr("x", (visConfig.natPauseButtonW + visConfig.natPauseButtonWidthSize + visConfig.natPauseButtonDivision))
+      .attr("width", visConfig.natPauseButtonWidthSize)
+      .attr("height", visConfig.natPauseButtonHeight)
+      .attr("fill", visConfig.natPlayButtonColor);
+
+    menuFilters.append("rect")
+      .attr("class", "pause-button")
+      .attr("y", visConfig.natPauseButtonH)
+      .attr("x", visConfig.natPauseButtonW)
+      .attr("width", (2*visConfig.natPauseButtonWidthSize + visConfig.natPauseButtonDivision))
+      .attr("height", visConfig.natPauseButtonHeight)
+      .attr("fill", "transparent")
+      .on("click", function() {
+        clearInterval(visConfig.animationTimer);
+
+        d3.select("rect.year-indicator")
+        .transition('changing-year')
+        .duration(300)
+        .attr("x", function() {
+          return visConfig.natYearIndicatorW + 
+                 visConfig.years[visConfig.natYearSelected] * visConfig.natYearIndicatorDistance -
+                 visConfig.natYearIndicatorSize/2
+        })
+      });
 
 
     drawGraph();
+    timeAnimation();
+    
+    function timeAnimation() {
+      visConfig.animationTimer = setInterval(function () {
+        var year = parseInt(visConfig.natYearSelected) + 1;
+        year = (year === 2015) ? 2009 : year;
+    
+        visConfig.natYearSelected = "" + year;
+        d3.selectAll("text.year-selector").classed("bold", false);
+        d3.select("#y" + year).classed("light", false).classed("bold", true);
+
+        d3.select("rect.year-indicator")
+        .transition('changing-year')
+        .duration(300)
+        .attr("x", function() {
+          return visConfig.natYearIndicatorW + 
+                 visConfig.years[visConfig.natYearSelected] * visConfig.natYearIndicatorDistance -
+                 visConfig.natYearIndicatorSize/2
+        })
+
+        drawGraph();
+      }, 3000);
+    }
 
     function drawGraph() {
 
@@ -261,8 +369,11 @@ function createVisNationalities(userWindowWidth) {
       var graph = vis.append("g")
         .attr("class", "graph");
 
+
+      // Messages to user
+
       graph.append("text")
-        .attr("class", "country-description")
+        .attr("class", "description-texts country-description")
         .attr("x", function() {
           var deslc = (visConfig.natGraphXAxisW)/4;
           return visConfig.baseWMargin + deslc;
@@ -275,7 +386,7 @@ function createVisNationalities(userWindowWidth) {
         .text("");
 
       graph.append("text")
-        .attr("class", "titles-description")
+        .attr("class", "description-texts titles-description")
         .attr("x", function() {
           var deslc = (visConfig.natGraphXAxisW)/4;
           return visConfig.baseWMargin + 2*deslc;
@@ -288,7 +399,7 @@ function createVisNationalities(userWindowWidth) {
         .text("");
 
       graph.append("text")
-        .attr("class", "public-description")
+        .attr("class", "description-texts public-description")
         .attr("x", function() {
           var deslc = (visConfig.natGraphXAxisW)/4;
           return visConfig.baseWMargin + 3*deslc;
@@ -301,7 +412,7 @@ function createVisNationalities(userWindowWidth) {
         .text("");
 
       graph.append("text")
-        .attr("class", "warning-description")
+        .attr("class", "description-texts warning-description")
         .attr("x", function() {
           var deslc = (visConfig.natGraphXAxisW)/2;
           return visConfig.baseWMargin + deslc;
@@ -313,14 +424,16 @@ function createVisNationalities(userWindowWidth) {
         .attr("font-weight", "lighter")
         .text("");
 
+      // Axis labels
+
       graph.append("text")
         .attr("class", "graph-description")
-        .attr("x", visConfig.natGraphAxisLabelsW)
+        .attr("x", visConfig.baseWMargin)
         .attr("y", (visConfig.height - visConfig.natGraphXAxisLabelH))
         .attr("text-anchor", "start")
         .attr("fill", visConfig.natContinentColor)
         .attr("font-size", visConfig.natSubTitleSize)
-        .text("Média");
+        .text("Média de Público");
 
       graph.append("text")
         .attr("class", "graph-description")
@@ -330,20 +443,6 @@ function createVisNationalities(userWindowWidth) {
         .attr("fill", visConfig.natContinentColor)
         .attr("font-size", visConfig.natSubTitleSize)
         .text("Títulos");
-
-
-
-      // Continent line
-
-      graph.append("line")
-        .attr("x1", visConfig.natDivisionLineW)
-        .attr("y1", visConfig.natDivisionLineH)
-        .attr("x2", function() {
-          return visConfig.natDivisionLineW + visConfig.natDivisionLineSize;
-        })
-        .attr("y2", visConfig.natDivisionLineH)
-        .attr("stroke", visConfig.natDivisionLineColor)
-        .attr("stroke-width", visConfig.natDivisionLineThickness);
 
 
       // Drawing Axis
@@ -453,10 +552,10 @@ function createVisNationalities(userWindowWidth) {
                 d3.select("text.public-description").text(function() {
                   return formatNumber(parseInt(data["Dados"]["Média"])) + " espectadores em média";
                 });
-                d3.selectAll("rect.country-bar").attr("stroke", "transparent").attr("stroke-width", 0);
-                d3.selectAll("path.country-path").attr("stroke", "transparent").attr("stroke-width", 0);
-                self.attr("stroke", visConfig.natStrokesColor).attr("stroke-width", visConfig.natStrokesWidth);
-                d3.select("path.path" + self.attr("item")).attr("stroke", visConfig.natStrokesColor).attr("stroke-width", visConfig.natStrokesWidth);
+                d3.selectAll("rect.country-bar").attr("opacity", 0.7);
+                d3.selectAll("path.country-path").attr("opacity", 0.7);
+                self.attr("opacity", 1);
+                d3.select("path.path" + self.attr("item")).attr("opacity", 1);
               })
               .on("mouseover", function() {
                 var self = d3.select(this);
@@ -519,10 +618,10 @@ function createVisNationalities(userWindowWidth) {
                 d3.select("text.public-description").text(function() {
                   return formatNumber(parseInt(data["Dados"]["Média"])) + " espectadores em média";
                 });
-                d3.selectAll("rect.country-bar").attr("stroke", "transparent").attr("stroke-width", 0);
-                d3.selectAll("path.country-path").attr("stroke", "transparent").attr("stroke-width", 0);
-                self.attr("stroke", visConfig.natStrokesColor).attr("stroke-width", visConfig.natStrokesWidth);
-                d3.select("rect.bar" + self.attr("item")).attr("stroke", visConfig.natStrokesColor).attr("stroke-width", visConfig.natStrokesWidth);
+                d3.selectAll("rect.country-bar").attr("opacity", 0.7);
+                d3.selectAll("path.country-path").attr("opacity", 0.7);
+                self.attr("opacity", 1);
+                d3.select("rect.bar" + self.attr("item")).attr("opacity", 1);
               })
               .attr("opacity", 0)
               .transition()
