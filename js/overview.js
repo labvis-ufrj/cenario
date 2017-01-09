@@ -1,6 +1,6 @@
 function createVisOverview(userWindowWidth) {
 
-  if (!visConfig.dataCircles) {
+  if (visConfig.dataCircles === undefined) {
     d3.json("js/data.json", function(error, json) {
       if (error) return console.warn(error);
       visConfig.data = json;
@@ -28,14 +28,12 @@ function createVisOverview(userWindowWidth) {
             index = (index < 0) ? 0 : (index > 11) ? 11 : index;
 
             var selfCurrentMonth = parseInt(self.attr("currentmonth"));
-            moveMainElementsX(dx, selfCurrentMonth, 0);           
+            moveSelfX(dx, selfCurrentMonth, 0);
 
-            if (index || index === 0) {
-              if (index > selfCurrentMonth) {
-                moveAllElementsX((index-1), index, selfCurrentMonth);
-              } else if (index < selfCurrentMonth) {
-                moveAllElementsX((index+1), index, selfCurrentMonth);
-              }
+            if (index > selfCurrentMonth) {
+              moveOthersX((index-1), index, selfCurrentMonth);
+            } else if (index < selfCurrentMonth) {
+              moveOthersX((index+1), index, selfCurrentMonth);
             }
           })
           .on("dragend", function() {
@@ -45,7 +43,7 @@ function createVisOverview(userWindowWidth) {
             var x = returnXPosition(parseInt(self.attr("currentmonth")));
             var selfCurrentMonth = self.attr("currentmonth");
 
-            moveMainElementsX(x, selfCurrentMonth, visConfig.monthMovingDuration);
+            moveSelfX(x, selfCurrentMonth, visConfig.monthMovingDuration);
 
           });
 
@@ -59,24 +57,22 @@ function createVisOverview(userWindowWidth) {
 
               var selfCurrentYear = parseInt(self.attr("currentyear"));
 
-              moveMainElementsY(dy, selfCurrentYear, 0);
+              moveSelfY(dy, selfCurrentYear, 0);
 
-              if (index || index === 0) {
-                if (index > selfCurrentYear) {
-                  moveAllElementsY((index-1), index, selfCurrentYear);
-                } else if (index < selfCurrentYear) {
-                  moveAllElementsY((index+1), index, selfCurrentYear);
-                }
+              if (index > selfCurrentYear) {
+                  moveOthersY((index-1), index, selfCurrentYear);
+              } else if (index < selfCurrentYear) {
+                  moveOthersY((index+1), index, selfCurrentYear);
               }
-            })
-            .on("dragend", function() {
+          })
+          .on("dragend", function() {
 
               var self = d3.select(this);
               var y = returnYPosition(parseInt(self.attr("currentyear")));
               var selfCurrentYear = self.attr("currentyear");
 
-              moveMainElementsY(y, selfCurrentYear, visConfig.monthMovingDuration);
-            });
+              moveSelfY(y, selfCurrentYear, visConfig.monthMovingDuration);
+          });
 
     var vis = d3.select("svg.vis")
       .append("g")
@@ -383,20 +379,54 @@ function createVisOverview(userWindowWidth) {
           .attr("opacity", 1);
       }
 
+      visYear.append("rect")
+        .attr("class", "year year-button")
+        .attr("x", visConfig.wYearRectMargin)
+        .attr("y", returnYPosition(visConfig.years[year]) + (visConfig.yearTextSize/3) - visConfig.yearTextSize)
+        .attr("width", visConfig.yearRectWidth)
+        .attr("height", visConfig.yearRectHeight)
+        .attr("rx", visConfig.monthBoxRadius)
+        .attr("ry", visConfig.monthBoxRadius)
+        .attr("originalyear", visConfig.years[year])
+        .attr("currentyear", visConfig.years[year])
+        .attr("fill", visConfig.monthBoxColor);
+
       visYear.append("text")
-        .attr("class", "year")
+        .attr("class", "year bold")
         .attr("x", function() {
           return visConfig.wYearMargin;
         })
         .attr("y", function() {
           return returnYPosition(visConfig.years[year]) + (visConfig.yearTextSize/3);
         })
-        .attr("text-anchor", "start")
+        .attr("text-anchor", "middle")
         .attr("font-size", visConfig.yearTextSize)
+        .attr("fill", "#FFFFFF")
         .text(year)
         .attr("originalyear", visConfig.years[year])
+        .attr("currentyear", visConfig.years[year]);
+
+      visYear.append("rect")
+        .attr("class", "year")
+        .attr("x", visConfig.wYearRectMargin)
+        .attr("y", returnYPosition(visConfig.years[year]) + (visConfig.yearTextSize/3) - 16)
+        .attr("width", visConfig.yearRectWidth)
+        .attr("height", visConfig.yearRectHeight)
+        .attr("rx", visConfig.monthBoxRadius)
+        .attr("ry", visConfig.monthBoxRadius)
+        .attr("originalyear", visConfig.years[year])
         .attr("currentyear", visConfig.years[year])
+        .attr("fill", "transparent")
+        .on("mouseover", function() {
+          d3.select("rect.year-button[currentyear='" + d3.select(this).attr('currentyear') + "']")
+            .attr('fill', visConfig.monthBoxHoverColor);        
+        })
+        .on("mouseout", function() {
+          d3.select("rect.year-button[currentyear='" + d3.select(this).attr('currentyear') + "']")
+            .attr('fill', visConfig.monthBoxColor);          
+        })
         .call(dragY);
+
     }
 
     scaleVis(scaleRatio(userWindowWidth, visConfig.width, visConfig.baseWidth));
