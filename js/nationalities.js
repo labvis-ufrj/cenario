@@ -256,6 +256,16 @@ function createVisNationalities(userWindowWidth) {
           configuration = calculateParameters();
           updateGraph();
         })
+        .on("mouseover", function() {
+          if (d3.select(this).attr("year") !== String(visConfig.natYearSelected)) {
+            d3.select(this).classed("bold", true).classed("light", false);
+          }
+        })
+        .on("mouseout", function() {
+          if (d3.select(this).attr("year") !== String(visConfig.natYearSelected)) {
+            d3.select(this).classed("bold", false).classed("light", true);
+          }
+        });
 
     }
 
@@ -351,21 +361,25 @@ function createVisNationalities(userWindowWidth) {
       d3.select("path.play-button").attr("opacity", 1);
       d3.selectAll("rect.pause-button").attr("opacity", visConfig.natAnimationNotSelectedOpacity);
 
-      visConfig.animationTimer = setInterval(function () {
-        var year = parseInt(visConfig.natYearSelected) + 1;
-        year = (year === 2015) ? 2009 : year;
-    
-        visConfig.natPreviousYearSelected = visConfig.natYearSelected;
-        visConfig.natYearSelected = "" + year;
-        d3.selectAll("text.year-selector").classed("bold", false);
-        d3.select("#y" + year).classed("light", false).classed("bold", true);
+      changeVisCurrentYear();
 
-        
-        moveYearIndicator();
+      visConfig.animationTimer = setInterval(changeVisCurrentYear, 4000);
+    }
 
-        configuration = calculateParameters();
-        updateGraph();
-      }, 6000);
+    function changeVisCurrentYear() {
+      var year = parseInt(visConfig.natYearSelected) + 1;
+      year = (year === 2015) ? 2009 : year;
+  
+      visConfig.natPreviousYearSelected = visConfig.natYearSelected;
+      visConfig.natYearSelected = "" + year;
+      d3.selectAll("text.year-selector").classed("bold", false);
+      d3.select("#y" + year).classed("light", false).classed("bold", true);
+
+      
+      moveYearIndicator();
+
+      configuration = calculateParameters();
+      updateGraph();
     }
 
     function moveYearIndicator() {
@@ -655,6 +669,8 @@ function createVisNationalities(userWindowWidth) {
         .duration(100)
         .attr("y", (visConfig.height - visConfig.natGraphRectBottomMargin) - 10)
         .attr("height", visConfig.natGraphRectH + 10);
+
+      // d3.select("text.country-mouseover").text(self.datum()["País"]);
     }
 
     function countryMouseleaveInteration(all) {
@@ -663,6 +679,8 @@ function createVisNationalities(userWindowWidth) {
         .duration(100)
         .attr("y", (visConfig.height - visConfig.natGraphRectBottomMargin))
         .attr("height", visConfig.natGraphRectH);
+
+      // d3.select("text.country-mouseover").text("");
     }
 
     function drawGraph() {
@@ -673,6 +691,16 @@ function createVisNationalities(userWindowWidth) {
         .attr("class", "graph");
 
       // Messages to user
+
+      graph.append("text")
+        .attr("class", "description-texts country-mouseover")
+        .attr("x", visConfig.baseWMargin)
+        .attr("y", (visConfig.height - visConfig.natGraphTextDescriptionBottomMargin))
+        .attr("text-anchor", "start")
+        .attr("fill", visConfig.natGraphTextDescriptionColor)
+        .attr("font-size", visConfig.natGraphTextDescriptionSize)
+        .attr("font-weight", "bold")
+        .text("");
 
       graph.append("text")
         .attr("class", "description-texts country-description")
